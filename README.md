@@ -7,7 +7,7 @@
 
 > ⭐ **¿Te ahorró horas de diagramas? Dale una estrella al repositorio** (botón **Star**, arriba a la derecha). Así más estudiantes y equipos la encuentran.
 
-Skill para **Claude Code** que construye diagramas UML **reales y editables** en **Sparx Enterprise Architect** (archivo `.eapx`), leyendo la documentación y el código de tu proyecto. No genera imágenes sueltas: crea elementos y conectores que puedes abrir, mover y corregir en EA.
+Skill para agentes de programación (**Claude Code, Codex, Gemini CLI, Antigravity, OpenCode, Cursor** y cualquiera que use el formato abierto `SKILL.md`) que construye diagramas UML **reales y editables** en **Sparx Enterprise Architect** (archivo `.eapx`), leyendo la documentación y el código de tu proyecto. No genera imágenes sueltas: crea elementos y conectores que puedes abrir, mover y corregir en EA.
 
 **Autor:** Hebert Suárez Burgos · **Licencia:** [CC BY-NC-ND 4.0](#licencia)
 
@@ -44,32 +44,47 @@ Skill para **Claude Code** que construye diagramas UML **reales y editables** en
 
 - **Windows** con **Windows PowerShell 5.1**.
 - **Sparx Enterprise Architect** instalado (probado con EA 15; sirve la versión de prueba). La skill lo maneja por su interfaz COM.
-- **Claude Code**.
+- Un agente que lea skills `SKILL.md` y pueda **ejecutar comandos de PowerShell** en tu equipo (Claude Code, Codex, Gemini CLI, Antigravity, OpenCode, Cursor...).
 - EA debe estar **cerrado** sobre el archivo que se va a modificar.
 
 ## Instalación
 
-### Opción 1: como plugin (recomendada)
+### Opción 1: cualquier agente, con un solo comando (recomendada)
 
-Dentro de Claude Code:
+Requiere [Node.js](https://nodejs.org). El instalador detecta qué agentes tienes y copia la skill en la carpeta correcta de cada uno:
 
-```text
-/plugin marketplace add hebertsb/diagramas-uml-ea
-/plugin install diagramas-uml-ea@skills-hebert
+```powershell
+npx skills add hebertsb/diagramas-uml-ea          # en el proyecto actual
+npx skills add hebertsb/diagramas-uml-ea -g       # global, para todos tus proyectos
+npx skills add hebertsb/diagramas-uml-ea -a codex # solo para un agente concreto
 ```
 
-Para recibir nuevas versiones: `/plugin marketplace update skills-hebert`.
+### Opción 2: Claude Code, como plugin
 
-### Opción 2: copiar la carpeta
+```powershell
+claude plugin marketplace add hebertsb/diagramas-uml-ea
+claude plugin install diagramas-uml-ea@skills-hebert
+```
 
-Copia `skills/diagramas-uml-ea/` (con el archivo `LICENSE`) en:
+(En la terminal de Claude Code también funciona con `/plugin ...`.) Para recibir nuevas versiones: `claude plugin marketplace update skills-hebert`.
 
-- `C:\Users\<tu-usuario>\.claude\skills\` para tenerla en todos tus proyectos, o
-- `<tu-proyecto>\.claude\skills\` para que la tenga todo tu equipo al clonar el repositorio.
+### Opción 3: copiar la carpeta a mano
+
+Copia `skills/diagramas-uml-ea/` (con el archivo `LICENSE`) en la carpeta de skills de tu agente:
+
+| Agente | En el proyecto | Global (todos tus proyectos) |
+|---|---|---|
+| Claude Code | `.claude/skills/` | `~/.claude/skills/` |
+| Codex (OpenAI) | `.codex/skills/` o `.agents/skills/` | `~/.codex/skills/` |
+| Gemini CLI | `.gemini/skills/` | `~/.gemini/skills/` |
+| Antigravity | `.agent/skills/` | `~/.gemini/antigravity/skills/` |
+| OpenCode | `.opencode/skills/` | `~/.config/opencode/skills/` |
+
+> Las rutas pueden cambiar entre versiones de cada agente; si no la detecta, revisa la documentación de tu agente o usa la opción 1, que se mantiene al día. `~` es tu carpeta de usuario (`C:\Users\<tu-usuario>`).
 
 ## Uso
 
-Pídeselo a Claude Code en lenguaje normal, por ejemplo:
+Pídeselo a tu agente en lenguaje normal, por ejemplo:
 
 - *"Créame los diagramas de casos de uso y de secuencia de este proyecto en Enterprise Architect."*
 - *"Haz el diagrama de navegación de cada actor del sistema."*

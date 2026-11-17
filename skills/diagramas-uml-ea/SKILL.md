@@ -10,7 +10,7 @@ license: CC BY-NC-ND 4.0 (ver LICENSE)
 
 # Diagramas UML en Enterprise Architect (por COM)
 
-Archivos en esta carpeta (la ruta exacta aparece al invocar la skill):
+Archivos en esta carpeta (junto a este `SKILL.md`; funciona con cualquier agente que lea skills en formato `SKILL.md` y pueda ejecutar PowerShell):
 - `GUIA_TECNICA.md`: cómo automatizar EA 15, funciones, recetas por tipo de diagrama, trampas, patrones de diseño (con Chain of Responsibility). **Léela completa antes de construir.**
 - `scripts\`: `ea_lib.ps1` (biblioteca), `nuevo_eapx.ps1`, `inspeccionar_eapx.ps1`, `guardar_enlaces_de_diagramas.ps1`, `ejemplo_generico.ps1`, `ejemplo_tipos_adicionales.ps1`, `ejemplo_patrones_detalle.ps1`, `ejemplo_navegacion_prototipos_requisitos.ps1` y `ejemplos_de_otro_proyecto\` (solo para ver técnicas).
 - `FORMATO_DISENO_DETALLE_PROCEDIMENTAL.md`: cómo se entrega un "diseño de detalle procedimental con patrones" (diagrama genérico del patrón + diagrama específico del caso de uso dentro de la arquitectura), con la notación y el método para ampliar casos de uso.

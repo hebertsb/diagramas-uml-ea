@@ -284,7 +284,7 @@ Si algo de esto falla o se cuelga, pasa a la alternativa más simple (estereotip
 Vas a construir/modificar diagramas UML en Enterprise Architect por COM para el sistema [NOMBRE Y DESCRIPCIÓN CORTA DEL SISTEMA].
 
 Lee primero, en este orden:
-1. El CLAUDE.md o las reglas de este proyecto, si existen.
+1. Las reglas del proyecto para agentes (CLAUDE.md, AGENTS.md, GEMINI.md o equivalentes), si existen.
 2. [RUTA]\LEEME_PRIMERO.md (cómo automatizar EA, trampas, recetas, patrones).
 3. [MI PROMPT O RÚBRICA DE DISEÑO DE DIAGRAMAS] y el .eapx base: [RUTA DEL .eapx].
 
