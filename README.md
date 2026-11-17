@@ -1,5 +1,12 @@
 # diagramas-uml-ea
 
+[![Estrellas](https://img.shields.io/github/stars/hebertsb/diagramas-uml-ea?style=social)](https://github.com/hebertsb/diagramas-uml-ea/stargazers)
+[![Licencia: CC BY-NC-ND 4.0](https://img.shields.io/badge/licencia-CC%20BY--NC--ND%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-nd/4.0/deed.es)
+![Claude Code](https://img.shields.io/badge/Claude%20Code-skill-D97757)
+![Enterprise Architect](https://img.shields.io/badge/Sparx-Enterprise%20Architect-2C6EB5)
+
+> ⭐ **¿Te ahorró horas de diagramas? Dale una estrella al repositorio** (botón **Star**, arriba a la derecha). Así más estudiantes y equipos la encuentran.
+
 Skill para **Claude Code** que construye diagramas UML **reales y editables** en **Sparx Enterprise Architect** (archivo `.eapx`), leyendo la documentación y el código de tu proyecto. No genera imágenes sueltas: crea elementos y conectores que puedes abrir, mover y corregir en EA.
 
 **Autor:** Hebert Suárez Burgos · **Licencia:** [CC BY-NC-ND 4.0](#licencia)
@@ -88,3 +95,9 @@ Esta obra está bajo la licencia **[Creative Commons Atribución-NoComercial-Sin
 ## Contribuir
 
 ¿Encontraste un error o tienes una mejora? Abre un **issue** o envía un **pull request** a este repositorio. Las mejoras aceptadas se publican aquí, con crédito a quien las aporte.
+
+## ¿Te sirvió?
+
+- ⭐ Dale una **estrella** al repositorio.
+- 👀 Pulsa **Watch → Releases** para enterarte de las nuevas versiones.
+- 💬 Compártela con tu curso o tu equipo y cuéntame en un *issue* qué diagramas hiciste con ella.
