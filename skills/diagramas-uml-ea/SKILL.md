@@ -47,6 +47,33 @@ Los scripts se corren con Windows PowerShell 5.1 y EA debe estar cerrado sobre e
 
 **6. Organizar el modelo** en paquetes claros según los diagramas y el alcance (por ejemplo: visión general, requisitos, casos de uso, procesos y actividades, dominio y clases, interacciones, arquitectura, datos, otros); adapta nombres y carpetas a lo que el proyecto necesite. No crees paquetes vacíos. Si hay un diagrama por caso de uso, proceso, módulo o historia, organízalos para que se encuentren fácil.
 
+**6b. Estructura por flujos de trabajo (Proceso Unificado / PUDS).** Si la metodología es Proceso Unificado, o el docente pide el modelo "por análisis, diseño e implementación", organiza el proyecto así (un paquete por actividad; dentro, un subpaquete y un diagrama por caso de uso o por paquete cuando corresponda):
+
+| Flujo | Paquete (actividad) | Diagramas |
+|---|---|---|
+| **Análisis** | Identificar Actores / Actores | Actores (con nota de descripción) |
+| | Estructurar Casos de Uso | Casos de uso global |
+| | Detallar Casos de Uso / `CUxx ...` | Un diagrama de casos de uso por CU (y su actividad o prototipo si se piden) |
+| | Analizar Casos de Uso / `CUxx ...` | Robustez (y secuencia de análisis) por CU |
+| | Identificar Paquetes | Paquetes de análisis |
+| | Relación de Paquete y Casos de Uso / `Relación Paquete X` | Paquete → sus CU con `«trace»` |
+| | Encapsulamiento / `Encapsulamiento de Paquete X` | Paquete con sus CU y los actores que los usan |
+| | Análisis de Paquetes | Paquetes con dependencias `«import»` |
+| | Modelo de Dominio | Clases del negocio (`+ atributo`, id, sin FK ni tipos) |
+| **Diseño** | Diseño de Clases | Clases de diseño (tipos y métodos, sin FK) |
+| | Diseño de BD | Modelo lógico/físico (PK, FK, tipos) |
+| | Diseño de Casos de Uso / `Diseño CUxx ...` | Secuencia de diseño (cajitas) por CU |
+| | Diseño de Paquetes | Paquetes de diseño o módulos |
+| | Diseño de Arquitectura | Despliegue (nodos, dispositivos, servicios externos) |
+| **Implementación** | Arquitectura del Sistema | Componentes del sistema |
+| | Arquitectura de Subsistemas / `Subsistema X` | Componentes de cada subsistema |
+
+Añade navegación web, prototipos y requisitos donde el docente los pida (normalmente en Análisis o Diseño). **Relaciones entre diagramas (trazabilidad):**
+- **Cada elemento se crea UNA vez**, en el paquete de la actividad donde nace (actores en *Actores*, CU en *Estructurar Casos de Uso*, paquetes en *Identificar Paquetes*, clases del negocio en *Modelo de Dominio*), y los demás diagramas **lo colocan de nuevo** con `Place` (EA lo muestra con "(from <paquete>)"). Nunca crees un segundo actor o CU con el mismo nombre.
+- Los conectores pertenecen al modelo, no al diagrama: al colocar un actor y un CU ya conectados, **la relación aparece sola**. Conéctalos una vez (Actor → CU con tipo `UseCase`).
+- Entre fases: paquete de análisis → CU con `Abstraction` + estereotipo `trace`; paquete → paquete con `Dependency` + `import`; clase de diseño → clase de dominio con `trace`; paquete `Diseño CUxx` → su CU con `trace`; componente → paquete que implementa con `Realisation`.
+- Ejemplo completo y probado: `scripts\ejemplo_estructura_puds.ps1`.
+
 **7. Construir** con `scripts\ea_lib.ps1`: un script por grupo de diagramas, un `try/catch` y un registro por diagrama, elementos reutilizados con `Find-Elem` en vez de copias incoherentes, y `Exporta` al final de cada diagrama (guarda también las líneas del diagrama en el archivo). Empieza por `ejemplo_generico.ps1` y `ejemplo_tipos_adicionales.ps1` como plantillas.
 
 **8. Reglas por tipo** (aplica solo las de los tipos del plan; recetas y código en la guía). **Cada diagrama sigue las normas de su propio tipo**: no mezcles la notación de uno con la de otro (por ejemplo, nada de mensajes numerados en robustez, ni tipos de dato en el modelo conceptual). Si el `.eapx` de referencia o el docente usan otra convención, sigue la de ellos y dilo.
@@ -55,7 +82,7 @@ Los scripts se corren con Windows PowerShell 5.1 y EA debe estar cerrado sobre e
 - *Clases de diseño:* clases con atributos (con visibilidad y tipo) y operaciones reales, relaciones justificadas, multiplicidades, herencias y dependencias. **Sin claves foráneas como atributo**: la asociación entre clases (o un atributo que es el objeto, `- cliente: Cliente`) ya representa la relación. Guarda y **verifica cada atributo y operación individualmente** tras reabrir.
 - *Secuencia:* hay **dos variantes**; si no está claro cuál piden, pregunta o haz las dos, y no mezcles sus notaciones en un mismo diagrama:
   - **Secuencia de análisis (ICONIX):** sale del diagrama de robustez. Participantes con estereotipo `boundary`, `control` y `entity` (EA los dibuja como **círculos**); mensajes en lenguaje del negocio (`Obtener sugerencia()`). En `Build-Sequence`, `t = 'boundary' | 'control' | 'entity'`.
-  - **Secuencia de diseño:** la que se pide para implementación (por ejemplo en taller de grado). Participantes como **cajitas** (rectángulos) con nombre de objeto `:Clase` tomado del **diagrama de clases de diseño o del código real** (`:PedidoView`, `:PedidoController`, `:PedidoService`, `:PedidoRepository`, `:Pedido`); el actor puede ir al inicio. Mensajes = **métodos reales con parámetros** (`crear(PedidoDTO)`, `guardar(pedido)`), retornos punteados con el valor devuelto, autollamadas para validaciones, `new Clase(...)` para crear objetos y fragmentos `alt`/`opt`/`loop` con su condición. En `Build-Sequence`, `t = ''` (sin estereotipo). Cada mensaje debe existir como operación en la clase que lo recibe.
+  - **Secuencia de diseño:** la que se pide para implementación (por ejemplo en taller de grado). Participantes como **cajitas** (rectángulos) con nombre de objeto `:Clase` tomado del **diagrama de clases de diseño o del código real** (`:PedidoView`, `:PedidoController`, `:PedidoService`, `:PedidoRepository`, `:Pedido`); el actor puede ir al inicio. Mensajes = **métodos reales con parámetros** (`crear(PedidoDTO)`, `guardar(pedido)`), retornos punteados con el valor devuelto, autollamadas para validaciones, `new Clase(...)` para crear objetos y fragmentos `alt`/`opt`/`loop` con su condición. En `Build-Sequence`, `t = ''` (sin estereotipo). Cada mensaje debe existir como operación en la clase que lo recibe. Modelo típico pedido en taller de grado: Actor → página o vista (`usuarioPage`) → controlador (`responsableLugarController`) → base de datos (`Postgres`), con autollamadas en la vista (`seleccionarLugar()`), llamadas con datos (`crearResponsabilidad(data)`), retornos punteados (`success()`, `ok()`) y el último mensaje de vuelta al actor (`mostrarListaResponsables()`). Los participantes se nombran como en el código; el prefijo `:` es opcional.
   - En las dos: verifica explícitamente el orden (`SequenceNo`) y que **persista al cerrar y volver a abrir**. Las condiciones de los fragmentos se escriben **sin corchetes** (EA los agrega).
 - *Comunicación:* participantes y mensajes numerados, coherentes con la secuencia de la misma funcionalidad.
 - *Modelo de dominio / mapeo conceptual:* solo las clases del negocio con sus relaciones y multiplicidades. Cada clase lleva sus atributos con visibilidad `+` y su identificador (clave primaria, por ejemplo `+ id_campana`). **No pongas claves foráneas** (la relación con la otra clase ya las representa), **ni tipos de dato** (`int`, `varchar`, `String`, `Date`...), **ni operaciones**. Los tipos, las claves foráneas y los métodos van en el diagrama de clases de diseño y en el modelo de datos.
@@ -98,6 +125,7 @@ Los scripts se corren con Windows PowerShell 5.1 y EA debe estar cerrado sobre e
 | Strategy y Template Method (genérico + específico), Singleton, abstractas/estáticas/protegidas, interfaz, notas, colores | Probado | `ejemplo_patrones_detalle.ps1` |
 | Despliegue, componentes, modelo de datos, secuencias largas | Probado (otro sistema) | `ejemplos_de_otro_proyecto\` |
 | Navegación web por actor (página cliente, formulario, página servidor, tabla), prototipo de interfaz, requisitos | Probado | `ejemplo_navegacion_prototipos_requisitos.ps1` |
+| Modelo organizado en Análisis / Diseño / Implementación con elementos reutilizados y relaciones `«trace»`, `«import»`, `Realisation`; secuencia de diseño con cajitas | Probado | `ejemplo_estructura_puds.ps1` |
 | Crear `.eapx` nuevo | Probado | `nuevo_eapx.ps1` |
 | Duplicar un diseño existente (paquete completo con zonas de color) y agregarle un patrón | Probado | `ejemplos_de_otro_proyecto\ejemplo_replicar_diseno_y_agregar_patron.ps1` |
 | BPMN 2.0, ocurrencias de colaboración, duplicar diagramas, fragmentos anidados, interfaces "piruleta" | **No probado** | probar primero en una copia y mirar el PNG |
