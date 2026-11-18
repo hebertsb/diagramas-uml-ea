@@ -28,7 +28,9 @@ Skill para agentes de programación (**Claude Code, Codex, Gemini CLI, Antigravi
 | **Navegación web (WAE)** | Uno por actor: páginas cliente, formularios, páginas servidor y tablas (`link`, `submit`, `build`, `access`) |
 | Prototipos de interfaz | Pantallas con sus controles |
 | Requisitos | RF/RNF trazados a los casos de uso |
-| Objetos, estados, paquetes, componentes, despliegue | Según la arquitectura real |
+| Despliegue | Nube, router, servicios externos y dispositivos, con los componentes que corren **dentro** de cada uno y enlaces `http/https` |
+| Componentes por subsistema | Usuario (páginas) → Servidor (controller, service, DTO, entity) → Base de datos (tablas) |
+| Objetos, estados, paquetes | Según la arquitectura real |
 | Patrones de diseño | Chain of Responsibility, Strategy, Template Method, Singleton: genérico + específico del caso de uso |
 
 <p>
@@ -86,6 +88,10 @@ Los diagramas quedan **relacionados entre sí**: cada actor, caso de uso o paque
 <p>
 <img src="docs/img/puds_a6_relacion_Pedidos.png" width="48%" alt="Relación paquete - casos de uso con trace">
 <img src="docs/img/puds_a2_estructurar_cu.png" width="48%" alt="Casos de uso reutilizando actores">
+</p>
+<p>
+<img src="docs/img/puds_d4_despliegue.png" width="48%" alt="Despliegue">
+<img src="docs/img/puds_i2_subsistema.png" width="48%" alt="Componentes de un subsistema">
 </p>
 
 ## Requisitos

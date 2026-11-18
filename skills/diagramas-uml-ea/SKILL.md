@@ -64,14 +64,14 @@ Los scripts se corren con Windows PowerShell 5.1 y EA debe estar cerrado sobre e
 | | Diseño de BD | **Dos diagramas:** `Modelo de Datos - Lógico` (sin FK ni tipos) y `Modelo de Datos - Físico` (PK, FK y tipos) |
 | | Diseño de Casos de Uso / `Diseño CUxx ...` | Secuencia de diseño (cajitas) por CU |
 | | Diseño de Paquetes | Paquetes de diseño o módulos |
-| | Diseño de Arquitectura | Despliegue (nodos, dispositivos, servicios externos) |
-| **Implementación** | Arquitectura del Sistema | Componentes del sistema |
-| | Arquitectura de Subsistemas / `Subsistema X` | Componentes de cada subsistema |
+| | Diseño de Arquitectura | **Despliegue**: `Node` para la nube, el router y cada servicio externo; `Device` para el celular o la PC; **dentro** de cada uno, los componentes que corren ahí (cluster de BD > motor; plataforma > API y front; SO > app), y enlaces `Association` con `http/https` |
+| **Implementación** | Arquitectura del Sistema | Paquetes con `«import»`, subsistemas `«subsystem»` (Frontend/Móvil, Backend), servicios externos `«service»` en verde con su interfaz provista, y la BD; `Dependency` del Backend a cada paquete |
+| | Arquitectura de Subsistemas / `Subsistema X` | Un diagrama de componentes por paquete, en tres bloques anidados: **Usuario** (páginas) → **Servidor** (controller, interfaz del service, DTO, `«entity»`) → **Base de datos** (`«table»`), unidos con `Dependency` |
 
 Añade navegación web, prototipos y requisitos donde el docente los pida (normalmente en Análisis o Diseño). **Relaciones entre diagramas (trazabilidad):**
 - **Cada elemento se crea UNA vez**, en el paquete de la actividad donde nace (actores en *Actores*, CU en *Estructurar Casos de Uso*, paquetes en *Identificar Paquetes*, clases del negocio en *Modelo de Dominio*), y los demás diagramas **lo colocan de nuevo** con `Place` (EA lo muestra con "(from <paquete>)"). Nunca crees un segundo actor o CU con el mismo nombre.
 - Los conectores pertenecen al modelo, no al diagrama: al colocar un actor y un CU ya conectados, **la relación aparece sola**. Conéctalos una vez (Actor → CU con tipo `UseCase`).
-- Entre fases: paquete de análisis → CU con `Abstraction` + estereotipo `trace`; paquete → paquete con `Dependency` + `import`; clase de diseño → clase de dominio con `trace`; paquete `Diseño CUxx` → su CU con `trace`; componente → paquete que implementa con `Realisation`.
+- Entre fases: paquete de análisis → CU con `Abstraction` + estereotipo `trace`; paquete → paquete con `Dependency` + `import`; clase de diseño → clase de dominio con `trace`; paquete `Diseño CUxx` → su CU con `trace`; subsistema (componente) → paquete que implementa con `Dependency` (así lo usa el `.eapx` de referencia del taller).
 - Ejemplo completo y probado: `scripts\ejemplo_estructura_puds.ps1`.
 
 **7. Construir** con `scripts\ea_lib.ps1`: un script por grupo de diagramas, un `try/catch` y un registro por diagrama, elementos reutilizados con `Find-Elem` en vez de copias incoherentes, y `Exporta` al final de cada diagrama (guarda también las líneas del diagrama en el archivo). Empieza por `ejemplo_generico.ps1` y `ejemplo_tipos_adicionales.ps1` como plantillas.

@@ -183,17 +183,67 @@ try {
     $d = Build-Sequence $repo $sub 'Diseno CU01 Registrar pedido' $part $msgs @() 220
     Log ("Diseno CU01: " + (Exporta $repo $d 'd3_secuencia_cu01'))
 
+    # Elemento anidado (dentro de otro): ParentID; al colocarlo, el contenedor lleva un z MAYOR para quedar atras
+    function Hijo($pk, $padre, $nombre, $tipo, $st = '') { $e = Add-Elem $pk $nombre $tipo $st; $e.ParentID = $padre.ElementID; [void]$e.Update(); return $e }
+
+    # Diseno de Arquitectura: DESPLIEGUE. Nodos (nube, router, servicios externos), Device (celular o PC) y, DENTRO,
+    # los componentes que corren ahi (cluster de BD > motor; plataforma > API y front; SO > app). Enlaces Association 'http/https'.
+    $pDA = Add-Pkg $di 'Diseno de Arquitectura'
+    $d = Add-Diag $pDA 'Diseno de Arquitectura' 'Deployment'
+    $nube = Add-Elem $pDA 'Nube (AWS)' 'Node'
+    $clu = Hijo $pDA $nube 'Database Cluster' 'Component'; $pg = Hijo $pDA $clu 'PostgreSQL 16' 'Component'
+    $plat = Hijo $pDA $nube 'App Platform Service' 'Component'; $api = Hijo $pDA $plat 'API web' 'Component'; $fw = Hijo $pDA $plat 'Front web' 'Component'
+    $rou = Add-Elem $pDA 'Router' 'Node'
+    $cel = Add-Elem $pDA 'Smartphone' 'Device'
+    $so = Hijo $pDA $cel 'Android SO' 'Component'; $app = Hijo $pDA $so 'App de pedidos' 'Component'
+    $pag = Add-Elem $pDA 'Pasarela de pagos' 'Node'; $lnk = Hijo $pDA $pag 'API de pagos' 'Component'
+    [void](Place $d $nube 40 60 560 330 3); [void](Place $d $clu 60 110 200 200 2); [void](Place $d $pg 80 160 160 110 1)
+    [void](Place $d $plat 290 110 290 260 2); [void](Place $d $api 320 160 200 80 1); [void](Place $d $fw 320 265 200 80 1)
+    [void](Place $d $rou 700 150 140 60)
+    [void](Place $d $cel 650 300 290 290 3); [void](Place $d $so 670 355 250 210 2); [void](Place $d $app 700 410 180 120 1)
+    [void](Place $d $pag 40 470 220 130 2); [void](Place $d $lnk 70 520 150 60 1)
+    [void](Add-Conn $nube $rou 'Association' 'http/https'); [void](Add-Conn $rou $cel 'Association' 'http/https'); [void](Add-Conn $pag $nube 'Association' 'http/https')
+    Fin $repo $d 'd4_despliegue'
+
     # ======================= IMPLEMENTACION =======================
     $im = Add-Pkg $raiz 'Implementacion'
+    # Arquitectura del Sistema: paquetes con <<import>>, subsistemas (<<subsystem>>), servicios externos (<<service>>, en verde)
+    # con su interfaz provista, y la BD; todo con Dependency (Backend -> cada paquete que implementa).
     $pArq = Add-Pkg $im 'Arquitectura del Sistema'
     $d = Add-Diag $pArq 'Arquitectura del Sistema' 'Component'
-    $cFront = Add-Elem $pArq 'Frontend' 'Component'
-    $cBack = Add-Elem $pArq 'Backend' 'Component'
-    $cBD = Add-Elem $pArq 'PostgreSQL' 'Component' 'database'
-    [void](Place $d $cFront 40 80 150 70); [void](Place $d $cBack 300 80 150 70); [void](Place $d $cBD 560 80 150 70)
-    [void](Place $d $paq['Pedidos'].Element 220 240 150 90); [void](Place $d $paq['Clientes'].Element 400 240 150 90)
-    [void](Add-Conn $cFront $cBack 'Dependency'); [void](Add-Conn $cBack $cBD 'Dependency')
-    [void](Add-Conn $cBack $paq['Pedidos'].Element 'Realisation'); [void](Add-Conn $cBack $paq['Clientes'].Element 'Realisation')
+    $cFront = Add-Elem $pArq 'Frontend' 'Component' 'subsystem'
+    $cBack = Add-Elem $pArq 'Backend' 'Component' 'subsystem'
+    $cBD = Add-Elem $pArq 'PostgreSQL DB' 'Component'
+    $cPay = Add-Elem $pArq 'Pagos Api' 'Component' 'service'
+    # la interfaz provista (circulito) va en EmbeddedElements del componente; con Elements.AddNew falla
+    $iPay = $cPay.EmbeddedElements.AddNew('Native Interface', 'ProvidedInterface'); [void]$iPay.Update()
+    [void](Place $d $paq['Pedidos'].Element 120 40 170 90); [void](Place $d $paq['Clientes'].Element 420 40 170 90)
+    [void](Place $d $cFront 60 230 150 70); [void](Place $d $cBack 340 230 150 70)
+    [void](Place $d $cPay 60 400 150 70); [void](Place $d $iPay 125 390 20 20); [void](Place $d $cBD 400 400 150 70)
+    [void](Add-Conn $cFront $cBack 'Dependency'); [void](Add-Conn $cBack $cBD 'Dependency'); [void](Add-Conn $cBack $cPay 'Dependency')
+    [void](Add-Conn $cFront $iPay 'Dependency')
+    [void](Add-Conn $cBack $paq['Pedidos'].Element 'Dependency'); [void](Add-Conn $cBack $paq['Clientes'].Element 'Dependency')
+    Set-ColorElemento $repo $d $cPay 80 220 170
     Fin $repo $d 'i1_arquitectura'
+
+    # Arquitectura de Subsistemas: un diagrama de componentes por subsistema (paquete), en tres capas anidadas:
+    # Usuario (paginas) -> Servidor (controller, interfaz del service, DTO, <<entity>>) -> Base de datos (<<table>>).
+    $pSub = Add-Pkg (Add-Pkg $im 'Arquitectura de Subsistemas') 'Subsistema Pedidos'
+    $d = Add-Diag $pSub 'Diagrama de Componentes Subsistema Pedidos' 'Component'
+    $u = Add-Elem $pSub 'Usuario' 'Component'
+    $p1 = Hijo $pSub $u 'Pedido Page' 'Component'; $p2 = Hijo $pSub $u 'Registrar Pedido Page' 'Component'
+    $sv = Add-Elem $pSub 'Servidor' 'Component'
+    $ctl = Hijo $pSub $sv 'Pedido Controller' 'Component'; $srv = Hijo $pSub $sv 'Pedido Service' 'Interface'
+    $dto1 = Hijo $pSub $sv 'create-Pedido DTO' 'Component'; $dto2 = Hijo $pSub $sv 'update-Pedido DTO' 'Component'
+    $ent = Hijo $pSub $sv 'Pedido' 'Component' 'entity'
+    $bd = Add-Elem $pSub 'Base de datos' 'Component'
+    $tb1 = Hijo $pSub $bd 'pedido' 'Component' 'table'; $tb2 = Hijo $pSub $bd 'cliente' 'Component' 'table'
+    [void](Place $d $u 40 40 640 150 2); [void](Place $d $p1 100 90 160 70 1); [void](Place $d $p2 400 90 180 70 1)
+    [void](Place $d $sv 40 240 640 330 2); [void](Place $d $ctl 280 280 160 60 1); [void](Place $d $srv 280 380 160 60 1)
+    [void](Place $d $dto1 70 480 160 60 1); [void](Place $d $dto2 490 380 160 60 1); [void](Place $d $ent 290 490 150 60 1)
+    [void](Place $d $bd 40 620 640 130 2); [void](Place $d $tb1 140 665 150 60 1); [void](Place $d $tb2 420 665 150 60 1)
+    [void](Add-Conn $u $sv 'Dependency'); [void](Add-Conn $sv $bd 'Dependency'); [void](Add-Conn $ctl $srv 'Dependency')
+    [void](Add-Conn $srv $dto1 'Dependency'); [void](Add-Conn $srv $dto2 'Dependency'); [void](Add-Conn $srv $ent 'Dependency')
+    Fin $repo $d 'i2_subsistema_pedidos'
 } catch { Log ("ERROR general: " + $_.Exception.Message + ' ' + $_.InvocationInfo.ScriptLineNumber) }
 finally { if ($repo) { $repo.CloseFile(); $repo.Exit() }; $sw.Close() }
