@@ -124,6 +124,12 @@ Copia `skills/diagramas-uml-ea/` (con el archivo `LICENSE`) en la carpeta de ski
 | Antigravity | `.agent/skills/` | `~/.gemini/antigravity/skills/` |
 | OpenCode | `.opencode/skills/` | `~/.config/opencode/skills/` |
 
+### Opción 4: subir como skill en claude.ai / Claude Desktop
+
+No subas el `.zip` de **Code → Download ZIP**: trae el manifiesto de plugin (`.claude-plugin/plugin.json`) y deja `SKILL.md` dentro de `skills/diagramas-uml-ea/`, y claude.ai lo rechaza. Descarga **`diagramas-uml-ea.zip`** desde [Releases](https://github.com/hebertsb/diagramas-uml-ea/releases), que contiene solo la carpeta de la skill con `SKILL.md` arriba.
+
+> **Importante:** en claude.ai la skill se ejecuta en un entorno en la nube (Linux), sin Enterprise Architect ni PowerShell, así que **no puede crear ni modificar el `.eapx`**. Úsala ahí solo como guía. Para generar los diagramas usa un agente local en Windows (opciones 1 a 3).
+
 > Las rutas pueden cambiar entre versiones de cada agente; si no la detecta, revisa la documentación de tu agente o usa la opción 1, que se mantiene al día. `~` es tu carpeta de usuario (`C:\Users\<tu-usuario>`).
 
 ## Uso
