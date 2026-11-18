@@ -19,11 +19,11 @@ Skill para agentes de programación (**Claude Code, Codex, Gemini CLI, Antigravi
 |---|---|
 | Casos de uso | Global y por caso de uso, con `include`/`extend` |
 | Actividad | Con calles (responsables), decisiones, inicio y fin |
-| Secuencia | Con fragmentos `alt`, `opt`, `loop`; orden de mensajes verificado |
+| Secuencia de **análisis** y de **diseño** | Dos variantes (ver abajo); fragmentos `alt`, `opt`, `loop`; orden de mensajes verificado |
 | Comunicación | Mensajes numerados, coherentes con la secuencia |
 | Clases de diseño | Atributos con tipo, operaciones, herencia, composición, multiplicidades |
 | Modelo de dominio (conceptual) | Atributos con `+` y clave primaria; sin claves foráneas ni tipos |
-| Modelo de datos | Tablas, columnas, claves primarias y foráneas |
+| Modelo de datos **lógico** y **físico** | Los dos, sobre las mismas tablas (ver abajo) |
 | Robustez ICONIX | Boundary, control y entity, con las reglas de conexión de ICONIX |
 | **Navegación web (WAE)** | Uno por actor: páginas cliente, formularios, páginas servidor y tablas (`link`, `submit`, `build`, `access`) |
 | Prototipos de interfaz | Pantallas con sus controles |
@@ -38,6 +38,48 @@ Skill para agentes de programación (**Claude Code, Codex, Gemini CLI, Antigravi
 <p>
 <img src="docs/img/g1_casos_de_uso.png" width="48%" alt="Casos de uso">
 <img src="docs/img/n2_prototipo.png" width="48%" alt="Prototipo de interfaz">
+</p>
+
+## Qué diagrama usar en tu documentación
+
+Algunos diagramas tienen **dos versiones**, porque cada docente pide una distinta. La skill genera las dos y tú pones en tu documento la que te pidan.
+
+### Secuencia: análisis o diseño
+
+| | **Secuencia de análisis** (ICONIX) | **Secuencia de diseño** |
+|---|---|---|
+| Para qué sirve | Entender el caso de uso antes de diseñar; sale del diagrama de robustez | Mostrar cómo se va a programar; es la que suelen pedir en **taller de grado** |
+| Participantes | **Círculos**: boundary, control y entity | **Cajitas** con las clases reales: página o vista → controlador → servicio → base de datos |
+| Mensajes | En lenguaje del negocio (`Obtener sugerencia()`) | Métodos reales con parámetros (`crearPedido(data)`), retornos punteados (`ok()`), autollamadas |
+| ¿Cuándo usarla? | Si tu metodología es ICONIX o te piden análisis | Si te piden el diseño o la implementación |
+
+<p>
+<img src="docs/img/puds_d3_secuencia_cu01.png" width="70%" alt="Secuencia de diseño">
+</p>
+
+### Modelo de datos: lógico o físico
+
+| Diagrama | Llaves foráneas | Tipos de dato | ¿Cuándo usarlo? |
+|---|---|---|---|
+| Modelo de dominio (mapeo conceptual) | ❌ No | ❌ No | Análisis: las clases del negocio |
+| Diagrama de clases de diseño | ❌ No (la asociación la representa) | ✅ Sí | Diseño: las clases del código |
+| **Modelo de datos lógico** | ❌ No (la **línea** con su cardinalidad la representa) | ❌ No | Cuando piden la estructura de la BD "estilo clases" |
+| **Modelo de datos físico** | ✅ Sí (`FK`) | ✅ Sí (`INT`, `VARCHAR`...) | Cuando piden la BD lista para crear las tablas |
+
+<p>
+<img src="docs/img/puds_d2_bd_logico.png" width="48%" alt="Modelo de datos lógico">
+<img src="docs/img/puds_d2_bd_fisico.png" width="48%" alt="Modelo de datos físico">
+</p>
+
+### Modelo organizado por fases (Proceso Unificado)
+
+Si tu materia usa el Proceso Unificado, la skill arma el `.eapx` en carpetas **Análisis → Diseño → Implementación**, con un paquete por actividad (Identificar Actores, Estructurar Casos de Uso, Detallar, Analizar, Identificar Paquetes, Encapsulamiento, Modelo de Dominio; Diseño de Clases, de BD, de CU, de Paquetes, de Arquitectura; Arquitectura del Sistema y de Subsistemas).
+
+Los diagramas quedan **relacionados entre sí**: cada actor, caso de uso o paquete se crea una sola vez y los demás diagramas lo reutilizan (si cambias un nombre, cambia en todos), y las fases se unen con relaciones `«trace»`, `«import»` y de realización. En otros proyectos, la skill organiza el modelo según lo que diga tu documentación.
+
+<p>
+<img src="docs/img/puds_a6_relacion_Pedidos.png" width="48%" alt="Relación paquete - casos de uso con trace">
+<img src="docs/img/puds_a2_estructurar_cu.png" width="48%" alt="Casos de uso reutilizando actores">
 </p>
 
 ## Requisitos
