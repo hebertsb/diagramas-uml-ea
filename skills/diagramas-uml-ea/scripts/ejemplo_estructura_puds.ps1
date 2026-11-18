@@ -18,6 +18,8 @@ function Fin($repo, $d, $png) { [void]$repo.ReloadDiagram($d.DiagramID); Log ("{
 # Atributos sin tipo y publicos (modelo de dominio: "+ nombre")
 function Add-Dominio($pk, $nombre, $attrs) {
     $c = Add-Elem $pk $nombre 'Class'
+    # Ojo: en clases con atributos SIN tipo, EA 15 los muestra en orden alfabetico aunque se indique Pos (probado);
+    # en las tablas del modelo fisico si respeta el orden.
     $i = 0; foreach ($a in $attrs) { Add-Attr $c $a '' 'Public' $false $i; $i++ }
     [void]$c.Refresh(); return $c
 }
@@ -139,14 +141,27 @@ try {
     [void](Trace $kCli $dCli); [void](Trace $kPed $dPed)
     Fin $repo $d 'd1_clases'
 
-    # BD: tablas con PK y FK y tipos
-    $d = Add-Diag $pBD 'Diseno de BD' 'Logical'; Estilo-Mas $d
-    $tCli = Add-Class $pBD 'cliente' 'table' @('id_cliente:INT PK', 'nombre:VARCHAR(100)', 'telefono:VARCHAR(20)') @()
-    $tPed = Add-Class $pBD 'pedido' 'table' @('id_pedido:INT PK', 'fecha:DATE', 'total:NUMERIC(14,2)', 'id_cliente:INT FK') @()
+    # BD: SIEMPRE los dos diagramas sobre las mismas tablas (el usuario usa el que pida su docente)
+    function Rel($hijo, $padre, $etq) {
+        $r = Add-Conn $hijo $padre 'Association' $etq
+        $r.ClientEnd.Cardinality = '0..*'; [void]$r.ClientEnd.Update(); $r.SupplierEnd.Cardinality = '1..1'; [void]$r.SupplierEnd.Update(); [void]$r.Update()
+    }
+    #   a) LOGICO: "+ atributo", id, SIN tipos y SIN columnas FK; la FK es la linea con cardinalidad
+    $pBDL = Add-Pkg $pBD 'Modelo de Datos - Logico'
+    $d = Add-Diag $pBDL 'Modelo de Datos - Logico' 'Logical'; Estilo-Mas $d
+    $lCli = Add-Dominio $pBDL 'cliente' @('id', 'nombre', 'telefono')
+    $lPed = Add-Dominio $pBDL 'pedido' @('id', 'fecha', 'total')
+    [void](Place $d $lCli 60 60 170 90); [void](Place $d $lPed 380 60 170 90)
+    Rel $lPed $lCli 'realiza'
+    Fin $repo $d 'd2_bd_logico'
+    #   b) FISICO: todas las columnas con tipo, PK y FK
+    $pBDF = Add-Pkg $pBD 'Modelo de Datos - Fisico'
+    $d = Add-Diag $pBDF 'Modelo de Datos - Fisico' 'Logical'; Estilo-Mas $d
+    $tCli = Add-Class $pBDF 'cliente' 'table' @('id_cliente:INT PK', 'nombre:VARCHAR(100)', 'telefono:VARCHAR(20)') @()
+    $tPed = Add-Class $pBDF 'pedido' 'table' @('id_pedido:INT PK', 'fecha:DATE', 'total:NUMERIC(14,2)', 'id_cliente:INT FK') @()
     [void](Place $d $tCli 60 60 210 90); [void](Place $d $tPed 380 60 210 110)
-    $r = Add-Conn $tPed $tCli 'Association' 'id_cliente'
-    $r.ClientEnd.Cardinality = '0..*'; [void]$r.ClientEnd.Update(); $r.SupplierEnd.Cardinality = '1'; [void]$r.SupplierEnd.Update(); [void]$r.Update()
-    Fin $repo $d 'd2_bd'
+    Rel $tPed $tCli 'id_cliente'
+    Fin $repo $d 'd2_bd_fisico'
 
     # Diseno de CU: secuencia de DISENO (cajitas) por CU, con <<trace>> desde el paquete del diseno al CU
     $sub = Add-Pkg $pDCU 'Diseno CU01 Registrar pedido'

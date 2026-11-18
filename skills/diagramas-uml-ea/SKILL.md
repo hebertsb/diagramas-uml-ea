@@ -61,7 +61,7 @@ Los scripts se corren con Windows PowerShell 5.1 y EA debe estar cerrado sobre e
 | | Análisis de Paquetes | Paquetes con dependencias `«import»` |
 | | Modelo de Dominio | Clases del negocio (`+ atributo`, id, sin FK ni tipos) |
 | **Diseño** | Diseño de Clases | Clases de diseño (tipos y métodos, sin FK) |
-| | Diseño de BD | Modelo lógico/físico (PK, FK, tipos) |
+| | Diseño de BD | **Dos diagramas:** `Modelo de Datos - Lógico` (sin FK ni tipos) y `Modelo de Datos - Físico` (PK, FK y tipos) |
 | | Diseño de Casos de Uso / `Diseño CUxx ...` | Secuencia de diseño (cajitas) por CU |
 | | Diseño de Paquetes | Paquetes de diseño o módulos |
 | | Diseño de Arquitectura | Despliegue (nodos, dispositivos, servicios externos) |
@@ -104,8 +104,11 @@ Añade navegación web, prototipos y requisitos donde el docente los pida (norma
 - *Requisitos:* diagrama `Custom`; cada requisito es un `Requirement` con su código (`RF01 ...`, `RNF01 ...`); la trazabilidad es `Realisation` del caso de uso al requisito que cumple. Todo RF debe quedar cubierto por algún caso de uso.
 - *Componentes, paquetes y despliegue:* módulos, servicios, nodos, dispositivos, bases de datos según la arquitectura documentada o implementada; distingue lo existente de lo propuesto.
 - *Estados:* estados, transiciones y eventos de las entidades o procesos que lo requieran; no inventes ni estados ni transiciones.
-- *Modelo de datos (lógico/físico, relacional):* es el **único** de los diagramas de datos que lleva claves foráneas. Cada tabla lleva su clave primaria (`PK`) y una columna `FK` por cada relación (en el lado "muchos" de una 1:N; en las N:M, una tabla intermedia con las dos FK); el físico agrega los tipos de dato (`INT`, `VARCHAR(100)`, `DATE`...) y restricciones, coherentes con el esquema real; **no modifiques la base de datos**.
-- *Resumen de claves foráneas:* modelo conceptual / de dominio → **no**; diagrama de clases de diseño → **no** (la asociación las representa); modelo lógico y físico de datos → **sí**. Si el docente o el `.eapx` de referencia piden otra cosa, sigue eso y dilo.
+- *Modelo de datos:* genera **siempre los dos** diagramas, sobre las **mismas tablas** del esquema real, para que el usuario use en su documentación el que le pida su docente (dilo en la entrega):
+  - **`Modelo de Datos - Lógico`** (estilo diagrama de clases): una clase por tabla con `+ atributo`, su `id`, **sin tipos de dato y sin columnas de clave foránea**; cada FK se representa con la **línea** de la relación y su cardinalidad (`1..1`, `0..*`). Revisa que no quede ninguna columna `*_id` que sea FK escrita como atributo.
+  - **`Modelo de Datos - Físico`** (relacional): las mismas tablas con todas las columnas, **tipos** (`INT`, `VARCHAR(100)`, `NUMERIC(14,2)`, `DATE`...), `PK`, una columna `FK` por cada relación (en el lado "muchos" de una 1:N; en las N:M, una tabla intermedia con las dos FK) y restricciones.
+  - Las relaciones y cardinalidades tienen que ser **idénticas** en los dos. **No modifiques la base de datos.**
+- *Resumen de claves foráneas y tipos:* modelo conceptual / de dominio → sin FK, sin tipos; diagrama de clases de diseño → sin FK (la asociación las representa), con tipos; modelo de datos lógico → sin FK, sin tipos; modelo de datos físico → **con FK y con tipos**. Si el docente o el `.eapx` de referencia piden otra cosa, sigue eso y dilo.
 - *Otros:* usa el tipo, los elementos y la notación apropiados; si EA no soporta exactamente la notación pedida, dilo y pregunta antes de reemplazarla.
 - *Patrones de diseño:* guía, secciones 10 y 11, y `FORMATO_DISENO_DETALLE_PROCEDIMENTAL.md`. Crear diagramas "con patrón" que reutilizan las mismas clases; confirmar en el código que el patrón existe; por cada caso de uso, diagrama genérico del patrón (con cita) + diagrama específico dentro de la arquitectura real.
 
