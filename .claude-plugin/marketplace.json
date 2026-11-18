@@ -9,7 +9,7 @@
       "name": "diagramas-uml-ea",
       "source": "./",
       "description": "Diagramas UML, ICONIX y de navegación web en Sparx Enterprise Architect (.eapx real y editable).",
-      "version": "1.1.0"
+      "version": "1.2.0"
     }
   ]
 }
