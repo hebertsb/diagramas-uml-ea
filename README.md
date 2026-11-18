@@ -20,7 +20,7 @@ Skill para agentes de programación (**Claude Code, Codex, Gemini CLI, Antigravi
 | Casos de uso | Global y por caso de uso, con `include`/`extend` |
 | Actividad | Con calles (responsables), decisiones, inicio y fin |
 | Secuencia de **análisis** y de **diseño** | Dos variantes (ver abajo); fragmentos `alt`, `opt`, `loop`; orden de mensajes verificado |
-| Comunicación | Mensajes numerados, coherentes con la secuencia |
+| Comunicación (antes "colaboración") | Mensajes numerados `1`, `1.1`, `1.2`..., coherentes con la secuencia; versión de análisis con boundary, control y entity |
 | Clases de diseño | Atributos con tipo, operaciones, herencia, composición, multiplicidades |
 | Modelo de dominio (conceptual) | Atributos con `+` y clave primaria; sin claves foráneas ni tipos |
 | Modelo de datos **lógico** y **físico** | Los dos, sobre las mismas tablas (ver abajo) |
@@ -74,6 +74,12 @@ Algunos diagramas tienen **dos versiones**, porque cada docente pide una distint
 ### Modelo organizado por fases (Proceso Unificado)
 
 Si tu materia usa el Proceso Unificado, la skill arma el `.eapx` en carpetas **Análisis → Diseño → Implementación**, con un paquete por actividad (Identificar Actores, Estructurar Casos de Uso, Detallar, Analizar, Identificar Paquetes, Encapsulamiento, Modelo de Dominio; Diseño de Clases, de BD, de CU, de Paquetes, de Arquitectura; Arquitectura del Sistema y de Subsistemas).
+
+En **Analizar Casos de Uso** va, por cada caso de uso, un diagrama de **comunicación de análisis** con el mismo nombre del caso de uso (por ejemplo `CU01 Registrar pedido`): actor, boundary, control y entity con los mensajes numerados. Es el diagrama que en UML 1.x se llamaba "de colaboración". Si tu metodología es ICONIX, en su lugar va el de robustez, sin mensajes.
+
+<p>
+<img src="docs/img/puds_a4_comunicacion_analisis.png" width="70%" alt="Comunicación de análisis">
+</p>
 
 Los diagramas quedan **relacionados entre sí**: cada actor, caso de uso o paquete se crea una sola vez y los demás diagramas lo reutilizan (si cambias un nombre, cambia en todos), y las fases se unen con relaciones `«trace»`, `«import»` y de realización. En otros proyectos, la skill organiza el modelo según lo que diga tu documentación.
 

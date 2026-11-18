@@ -73,14 +73,19 @@ try {
         Fin $repo $d ("a3_detallar_" + $k)
     }
 
-    # 4) Analizar casos de uso: robustez por CU (Collaboration + Object con estereotipo); actor reutilizado
+    # 4) Analizar casos de uso: diagrama de COMUNICACION de analisis por CU (Collaboration + Object boundary/control/entity,
+    #    enlaces Association y mensajes numerados 1, 1.1, 1.2...). El diagrama se llama igual que el CU. Actor reutilizado.
     $sub = Add-Pkg $pAna 'CU01 Registrar pedido'
     $d = Add-Diag $sub 'CU01 Registrar pedido' 'Collaboration'
-    $iu = Add-Elem $sub 'IU Registrar pedido' 'Object' 'boundary'
-    $ct = Add-Elem $sub 'Control registrar pedido' 'Object' 'control'
-    $en = Add-Elem $sub 'Pedido' 'Object' 'entity'
-    [void](Place $d $ven 40 80 60 90); [void](Place $d $iu 200 90 70 70); [void](Place $d $ct 380 90 70 70); [void](Place $d $en 560 90 70 70)
+    $iu = Add-Elem $sub 'PedidoView' 'Object' 'boundary'
+    $ct = Add-Elem $sub 'PedidoController' 'Object' 'control'
+    $en = Add-Elem $sub 'pedido' 'Object' 'entity'
+    [void](Place $d $ven 70 240 60 90); [void](Place $d $iu 260 260 60 60); [void](Place $d $ct 430 260 60 60); [void](Place $d $en 600 260 60 60)
     [void](Add-Conn $ven $iu 'Association'); [void](Add-Conn $iu $ct 'Association'); [void](Add-Conn $ct $en 'Association')
+    $mc = @(@($ven, $iu, 'registrar', '1', ''), @($iu, $ct, 'registrarPedido', '1.1', 'pedido'), @($ct, $en, 'create', '1.2', 'pedido'),
+            @($ven, $iu, 'listar', '2', ''), @($iu, $ct, 'listar', '2.1', ''), @($ct, $en, 'find', '2.2', ''))
+    $i = 1; foreach ($m in $mc) { [void](Add-MsgCom $repo $d $m[0] $m[1] $m[2] $i $m[3] $m[4]); $i++ }
+    Build-Comunicacion $repo $d
     Fin $repo $d 'a4_analizar_cu01'
 
     # 5) Identificar paquetes: los paquetes de analisis se crean aqui

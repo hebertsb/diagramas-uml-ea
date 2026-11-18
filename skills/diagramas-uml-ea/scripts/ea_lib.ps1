@@ -315,3 +315,34 @@ function Build-Sequence($repo, $pk, $nombre, $part, $msgs, $frags, [int]$sep = 1
     return $d
 }
 $global:ExtraAutoenvio = 16
+
+# ---------- Comunicacion (colaboracion en UML 1.x) con mensajes numerados 1, 1.1, 1.2, 2... ----------
+# Probado en EA 15 copiando la estructura de un .eapx hecho a mano: los enlaces son Association y cada mensaje es un
+# conector 'Collaboration' (Synchronous/Call) con el numero de nivel en PDATA4. EA colorea cada grupo (1, 2, 3...) solo.
+# Limitacion: la flechita de direccion junto a cada mensaje NO aparece cuando el mensaje se crea por COM (el numero si).
+# Uso: crea objetos y Association, luego Add-MsgCom por mensaje, y al final Build-Comunicacion (guarda y acomoda).
+function Add-MsgCom($repo, $diag, $de, $a, $nombre, [int]$seq, [string]$nivel, $params = '') {
+    $c = $de.Connectors.AddNew($nombre, 'Collaboration')
+    $c.SupplierID = $a.ElementID
+    $c.SequenceNo = $seq
+    $c.DiagramID = $diag.DiagramID
+    $c.Direction = 'Source -> Destination'
+    $c.TransitionEvent = 'Synchronous'; $c.TransitionAction = 'Call'
+    if ($params) { $c.TransitionGuard = "params=;paramsDlg=$params;" }
+    [void]$c.Update()
+    [void]$repo.Execute("UPDATE t_connector SET PDATA1='Synchronous', PDATA2='$(Sq $c.TransitionGuard)', PDATA3='Call', PDATA4='$(Sq $nivel)', StateFlags='IsReturn=false;', DestIsNavigable=TRUE, SourceTS='instance', DestTS='instance' WHERE Connector_ID=$($c.ConnectorID)")
+    return $c
+}
+# Guarda los enlaces, muestra los numeros (SuppCN=0) y apila los mensajes encima de su enlace: un renglon por grupo.
+function Build-Comunicacion($repo, $diag) {
+    Guardar-Enlaces $repo $diag
+    [void]$repo.Execute("UPDATE t_diagram SET PDATA=REPLACE(PDATA,'SuppCN=1','SuppCN=0') WHERE Diagram_ID=$($diag.DiagramID)")
+    $x = [xml]$repo.SQLQuery("SELECT Connector_ID, PDATA4 FROM t_connector WHERE DiagramID=$($diag.DiagramID) AND Connector_Type='Collaboration'")
+    foreach ($r in $x.EADATA.Dataset_0.Data.Row) {
+        $g = [int](([string]$r.PDATA4).Split('.')[0]); $sy = 85 - 19 * ($g - 1); $ey = $sy - 15
+        $geo = "SX=-15;SY=$sy;EX=-15;EY=$ey;EDGE=2;"
+        [void]$repo.Execute("UPDATE t_connector SET PDATA5='$geo', RouteStyle=1, Top_Start_Label=PDATA4 & ': <call>()' WHERE Connector_ID=$($r.Connector_ID)")
+        [void]$repo.Execute("UPDATE t_diagramlinks SET Geometry='$geo`$LLB=;LLT=;LMT=;LMB=;LRT=;LRB=;IRHS=;ILHS=;', Style=REPLACE(Style,'Mode=3','Mode=1') WHERE ConnectorID=$($r.Connector_ID) AND DiagramID=$($diag.DiagramID)")
+    }
+    [void]$repo.ReloadDiagram($diag.DiagramID)
+}

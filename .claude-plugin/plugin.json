@@ -1,6 +1,6 @@
 {
   "name": "diagramas-uml-ea",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "Diagramas UML, ICONIX y de navegación web en Sparx Enterprise Architect (.eapx real y editable) generados por COM a partir de la documentación y el código del proyecto.",
   "author": {
     "name": "Hebert Suárez Burgos"
